@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker Terminal</title>
+    <style>
+        body {
+            background-color: black;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 80px 20px 20px;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a0a0a;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1001;
+        }
+        
+        .menu-btn:hover {
+            background: #111;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 70px 15px 20px;
+            overflow-y: auto;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .version {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-section h3 {
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        .nav-link {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            padding: 8px 10px;
+            margin: 3px 0;
+            font-size: 13px;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background: #111;
+            border-left-color: #444;
+            color: #fff;
+        }
+        
+        .home-link {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: #111;
+            border: 1px solid #222;
+            text-align: center;
+        }
+        
+        .home-link:hover {
+            background: #1a1a1a;
+        }
+        
+        a {
+            color: #00ff00;
+        }
+        input {
+            background-color: black;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 5px;
+            width: 300px;
+        }
+        button {
+            background-color: black;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Nicholas's Website</div>
+        <div class="version">v4.0</div>
+        
+        <a href="index.html" class="home-link">← Home</a>
+        
+        <div class="nav-section">
+            <h3>Tools</h3>
+            <a href="weatherprank.html" class="nav-link">Weather</a>
+            <a href="calculator.html" class="nav-link">Calculator</a>
+            <a href="downloadram.html" class="nav-link">Download RAM</a>
+            <a href="virusscan.html" class="nav-link">Virus Scan</a>
+            <a href="magic8ball.html" class="nav-link">Magic 8-Ball</a>
+            <a href="excuses.html" class="nav-link">Excuses</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Games</h3>
+            <a href="squarejump.html" class="nav-link">Square Jump</a>
+            <a href="scratch.html" class="nav-link">Flap Me Bird</a>
+            <a href="button.html" class="nav-link">Useless Button</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Other</h3>
+            <a href="asciiart.html" class="nav-link">ASCII Art</a>
+            <a href="cube3d.html" class="nav-link">3D Cube</a>
+            <a href="hacker.html" class="nav-link">Terminal</a>
+            <a href="pi.html" class="nav-link">Pi Digits</a>
+            <a href="loading.html" class="nav-link">Loading</a>
+        </div>
+    </div>
+    
+    <h1>HACKER TERMINAL v1.337</h1>
+    <p>Enter command:</p>
+    <input type="text" id="command" placeholder="Type 'help' for commands">
+    <button onclick="execute()">Execute</button>
+    
+    <div id="output"></div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+        
+        async function execute() {
+            const cmd = document.getElementById('command').value.toLowerCase().trim();
+            const output = document.getElementById('output');
+            
+            if (!cmd) return;
+            
+            let response = '';
+            
+            if (cmd === 'help') {
+                response = `
+Available commands:
+- hack [target]
+- scan
+- decrypt
+- bypass
+- access mainframe
+- download database
+- inject [message]
+- clear
+                `;
+            } else if (cmd.startsWith('hack ')) {
+                const target = cmd.substring(5);
+                response = `
+Initializing hack on ${target}...
+[##########] 100%
+Access granted. ${target} has been hacked.
+                `;
+            } else if (cmd === 'scan') {
+                response = `
+Scanning network...
+Found 47 devices
+12 vulnerabilities detected
+Systems ready for exploitation
+                `;
+            } else if (cmd === 'decrypt') {
+                response = `
+Decrypting files...
+[##########] 100%
+Password: hunter2
+Encryption bypassed successfully
+                `;
+            } else if (cmd === 'bypass') {
+                response = `
+Bypassing security...
+Firewall disabled
+Intrusion detection offline
+Access level: ADMINISTRATOR
+                `;
+            } else if (cmd === 'access mainframe') {
+                response = `
+Connecting to mainframe...
+Connection established
+Root access granted
+Welcome, user_1337
+                `;
+            } else if (cmd === 'download database') {
+                response = `
+Downloading database...
+[##########] 100%
+Downloaded: top_secret_files.zip (999 GB)
+Transfer complete
+                `;
+            } else if (cmd.startsWith('inject ')) {
+                const message = cmd.substring(7);
+                
+                // Get character limit
+                const limitResponse = await fetch('admin_process.php?get_char_limit=1');
+                const charLimit = parseInt(await limitResponse.text());
+                
+                // Check message length
+                if (message.length > charLimit) {
+                    response = `
+Error: Message too long
+Maximum length: ${charLimit} characters
+Your message: ${message.length} characters
+                    `;
+                    const newLine = document.createElement('pre');
+                    newLine.textContent = '> ' + cmd + response;
+                    output.appendChild(newLine);
+                    document.getElementById('command').value = '';
+                    return;
+                }
+                
+                // Check for profanity
+                const formData = new FormData();
+                formData.append('text', message);
+                
+                try {
+                    const profanityCheck = await fetch('check_profanity.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const profanityResult = await profanityCheck.text();
+                    
+                    if (profanityResult === 'profane') {
+                        response = `
+Error: Message contains inappropriate content
+Injection blocked
+                        `;
+                        const newLine = document.createElement('pre');
+                        newLine.textContent = '> ' + cmd + response;
+                        output.appendChild(newLine);
+                        document.getElementById('command').value = '';
+                        return;
+                    }
+                } catch(e) {
+                    console.error('Profanity check failed');
+                }
+                
+                // Send to PHP backend
+                const saveData = new FormData();
+                saveData.append('message', message);
+                
+                try {
+                    const result = await fetch('savemessage.php', {
+                        method: 'POST',
+                        body: saveData
+                    });
+                    const text = await result.text();
+                    
+                    if (text.includes('success')) {
+                        response = `
+Message injected successfully
+Target: index.html
+Payload: "${message}"
+Changes will appear on next page load
+
+You're welcome john
+                        `;
+                    } else {
+                        response = `
+Error: Injection failed
+                        `;
+                    }
+                } catch(e) {
+                    response = `
+Error: Connection to server failed
+                    `;
+                }
+            } else if (cmd === 'clear') {
+                output.innerHTML = '';
+                document.getElementById('command').value = '';
+                return;
+            } else {
+                response = `
+Error: Command '${cmd}' not recognized
+Type 'help' for available commands
+                `;
+            }
+            
+            const newLine = document.createElement('pre');
+            newLine.textContent = '> ' + cmd + response;
+            output.appendChild(newLine);
+            
+            document.getElementById('command').value = '';
+        }
+        
+        // Allow Enter key to execute
+        document.getElementById('command').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                execute();
+            }
+        });
+    </script>
+</body>
+</html>

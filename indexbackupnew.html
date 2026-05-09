@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nicholas's Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #ddd;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 20px 15px;
+            overflow-y: auto;
+        }
+        
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: #0a0a0a; }
+        .sidebar::-webkit-scrollbar-thumb { background: #333; }
+        
+        .logo { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .version { font-size: 11px; color: #666; margin-bottom: 25px; }
+        
+        .user-info {
+            background: #111;
+            padding: 12px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            border: 1px solid #222;
+        }
+        .user-info a { color: #888; text-decoration: none; }
+        .user-info a:hover { color: #aaa; }
+        
+        .nav-section { margin-bottom: 20px; }
+        .nav-section h3 {
+            font-size: 11px; color: #555;
+            text-transform: uppercase; margin-bottom: 8px; font-weight: normal;
+        }
+        .nav-section h3.members-label { color: #664400; }
+        
+        .nav-link {
+            display: block; color: #aaa; text-decoration: none;
+            padding: 8px 10px; margin: 3px 0; font-size: 13px;
+            border-left: 2px solid transparent;
+        }
+        .nav-link:hover { background: #111; border-left-color: #444; color: #fff; }
+        .nav-link.members { color: #886633; }
+        .nav-link.members:hover { border-left-color: #664400; color: #bb9944; }
+        
+        .main-content { margin-left: 220px; padding: 40px; }
+        .header { margin-bottom: 40px; }
+        .header h1 { font-size: 36px; color: #fff; margin-bottom: 5px; }
+        .header .wip { color: #666; font-size: 13px; }
+        
+        .hacker-box {
+            background: #0a0a0a; border: 1px solid #222;
+            padding: 20px; margin-bottom: 30px;
+        }
+        .hacker-box h3 {
+            color: #888; font-family: 'Courier New', monospace;
+            margin-bottom: 10px; font-size: 14px; font-weight: normal;
+        }
+        .hacker-box p {
+            color: #aaa; font-family: 'Courier New', monospace;
+            font-size: 13px; line-height: 1.5;
+        }
+        
+        .description {
+            background: #0a0a0a; padding: 25px;
+            margin-bottom: 30px; border: 1px solid #222;
+        }
+        .description p { line-height: 1.7; font-size: 14px; color: #bbb; }
+        
+        .ascii-art {
+            background: #0a0a0a; padding: 25px;
+            margin-bottom: 30px; overflow-x: auto; border: 1px solid #222;
+        }
+        .ascii-art pre {
+            color: #888; font-family: 'Courier New', monospace;
+            font-size: 11px; line-height: 1.2;
+        }
+        
+        .loading-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: #000;
+            display: none; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .loading-screen h2 { color: #888; font-size: 24px; font-weight: normal; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid #222; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .header h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Nicholas's Website</div>
+        <div class="version">v5.0 BETA</div>
+        
+        <div class="user-info" id="userInfo">
+            <a href="login.html">login</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Tools</h3>
+            <a href="#" onclick="return handleClick('weatherprank.html', false)" class="nav-link">Weather</a>
+            <a href="#" onclick="return handleClick('calculator.html', false)" class="nav-link">Calculator</a>
+            <a href="#" onclick="return handleClick('downloadram.html', false)" class="nav-link">Download RAM</a>
+            <a href="#" onclick="return handleClick('virusscan.html', false)" class="nav-link">Virus Scan</a>
+            <a href="#" onclick="return handleClick('excuses.html', false)" class="nav-link">Excuses</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Games</h3>
+            <a href="#" onclick="return handleClick('button.html', false)" class="nav-link">Useless Button</a>
+            <a href="#" onclick="return handleClick('magic8ball.html', false)" class="nav-link">Magic 8-Ball</a>
+        </div>
+
+        <div class="nav-section">
+            <h3 class="members-label">Members Only</h3>
+            <a href="#" onclick="return handleClick('squarejump.html', true)" class="nav-link members">Square Jump</a>
+            <a href="#" onclick="return handleClick('scratch.html', true)" class="nav-link members">Flap Me Bird</a>
+            <a href="#" onclick="return handleClick('hacker.html', true)" class="nav-link members">Terminal</a>
+            <a href="#" onclick="return handleClick('Originalparticlegamenotstolenatall.html', false)" class="nav-link">Rock Pixels (beta)</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Other</h3>
+            <a href="#" onclick="return handleClick('asciiart.html', false)" class="nav-link">ASCII Art</a>
+            <a href="#" onclick="return handleClick('cube3d.html', false)" class="nav-link">3D Cube</a>
+            <a href="#" onclick="return handleClick('pi.html', false)" class="nav-link">Pi Digits</a>
+            <a href="#" onclick="return handleClick('loading.html', false)" class="nav-link">Loading</a>
+            <a href="#" onclick="return handleClick('ggggg.html', false)" class="nav-link">Click here for a special suprise!</a>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>Welcome to Nicholas's Website</h1>
+            <p class="wip">(work in progress)</p>
+        </div>
+        
+        <div class="hacker-box">
+            <h3>SYSTEM MESSAGE</h3>
+            <p id="hackerMessage">Loading...</p>
+        </div>
+        
+        <div class="description">
+            <p>Welcome to My secret site! Don't tell anyone, or else! I hope you never see this site again unless you are me! As you probably know by now, this is my website. i spent a lot of time on this, so i hope you enjoy it! I've spent so much time making this new ui, so pls dont complain (you know who you are) or try to break my website. Anyways, welcome! I hope you love it! Words cannot explain how much better this is, but if you are like me and kinda want to go back, be sure to visit nicholassecretwebsitebackup.page.gd to see the old version! All updates on the main will also go onto the legacy site! but it's slightly broken rn with the issue that this used to have, but it wont fix on that ¯\_(ツ)_/¯. I'll get to it tho!</p>
+        </div>
+        
+        <div class="ascii-art">
+            <pre>
+       _____                            
+      /     \                                                      .--------.
+     |  O   O|                                                    | .----. |
+     |   >   |                                                    ||o ()o ||
+      \_____/                                                     || (::) ||
+        |||                                                       | '--o-' |
+       /|||\____                                                   '--------'
+      / |||     )===>  *  *  *  *  *  *  *  *  *  *  *  *
+     |  |||                                        
+     |  |||                                        
+       /   \                                       
+      /     \                                       
+     /       \
+            </pre>
+        </div>
+    </div>
+    
+    <div class="loading-screen" id="loadingScreen">
+        <h2>Loading...</h2>
+    </div>
+
+    <script>
+        let isLoggedIn = false;
+
+        fetch('check_session.php')
+            .then(r => r.text())
+            .then(data => {
+                const parts = data.split('|');
+                const loggedInUser = parts[0] !== 'null' ? parts[0] : null;
+                isLoggedIn = loggedInUser !== null;
+                if (loggedInUser) {
+                    document.getElementById('userInfo').innerHTML =
+                        loggedInUser + '<br><a href="logout.php">logout</a>';
+                }
+            })
+            .catch(() => {});
+
+        function loadMessage() {
+            fetch('getmessage.php?t=' + new Date().getTime())
+                .then(response => response.text())
+                .then(message => {
+                    document.getElementById('hackerMessage').textContent = message;
+                })
+                .catch(() => {
+                    document.getElementById('hackerMessage').textContent = 'Aiden is BANNED FOREVER';
+                });
+        }
+
+        loadMessage();
+        setInterval(loadMessage, 5000);
+
+        function handleClick(url, membersOnly) {
+            if (membersOnly && !isLoggedIn) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            document.getElementById('loadingScreen').style.display = 'flex';
+            setTimeout(() => { window.location.href = url; }, 500);
+            return false;
+        }
+    </script>
+</body>
+</html>

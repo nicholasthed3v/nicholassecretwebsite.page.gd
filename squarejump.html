@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Jump</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 80px 20px 20px;
+            background-color: #000;
+            color: #fff;
+            font-family: monospace;
+            overflow: hidden;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            color: #aaa;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1001;
+        }
+        
+        .menu-btn:hover {
+            background: #111;
+            color: #fff;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 70px 15px 20px;
+            overflow-y: auto;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .version {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-section h3 {
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        .nav-link {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            padding: 8px 10px;
+            margin: 3px 0;
+            font-size: 13px;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background: #111;
+            border-left-color: #444;
+            color: #fff;
+        }
+        
+        .home-link {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: #111;
+            border: 1px solid #222;
+            text-align: center;
+        }
+        
+        .home-link:hover {
+            background: #1a1a1a;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #fff;
+            display: block;
+            margin: 20px auto;
+            background-color: #1a1a2e;
+        }
+        #score {
+            text-align: center;
+            font-size: 24px;
+            margin: 10px;
+            display: none;
+        }
+        #gameOver {
+            display: none;
+            text-align: center;
+            font-size: 32px;
+            margin: 20px;
+        }
+        #menu {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .level-select {
+            display: inline-block;
+            margin: 15px;
+            padding: 20px;
+            border: 3px solid #0ff;
+            background-color: #1a1a2e;
+            cursor: pointer;
+            width: 150px;
+            transition: all 0.3s;
+        }
+        .level-select:hover {
+            background-color: #0ff;
+            color: #000;
+            transform: scale(1.1);
+        }
+        .level-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .level-difficulty {
+            font-size: 14px;
+            color: #888;
+        }
+        .level-select:hover .level-difficulty {
+            color: #000;
+        }
+        a {
+            color: #0ff;
+        }
+        button {
+            background-color: #333;
+            color: #0ff;
+            border: 2px solid #0ff;
+            font-family: monospace;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #0ff;
+            color: #000;
+        }
+        #currentLevel {
+            text-align: center;
+            font-size: 20px;
+            margin: 10px;
+            display: none;
+        }
+        #leaderboardSection {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .leaderboard {
+            display: inline-block;
+            margin: 20px;
+            padding: 15px;
+            border: 2px solid #0ff;
+            background-color: #1a1a2e;
+            min-width: 300px;
+            vertical-align: top;
+        }
+        .leaderboard h3 {
+            color: #0ff;
+            margin-top: 0;
+        }
+        .leaderboard-entry {
+            padding: 5px;
+            margin: 5px 0;
+            text-align: left;
+        }
+        .leaderboard-entry.top {
+            color: #ffd700;
+        }
+        input[type="text"] {
+            background-color: #1a1a2e;
+            color: #0ff;
+            border: 2px solid #0ff;
+            font-family: monospace;
+            padding: 10px;
+            font-size: 18px;
+            margin: 10px;
+        }
+        #nameEntry {
+            display: none;
+            text-align: center;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Nicholas's Website</div>
+        <div class="version">v4.0</div>
+        
+        <a href="index.html" class="home-link">← Home</a>
+        
+        <div class="nav-section">
+            <h3>Tools</h3>
+            <a href="weatherprank.html" class="nav-link">Weather</a>
+            <a href="calculator.html" class="nav-link">Calculator</a>
+            <a href="downloadram.html" class="nav-link">Download RAM</a>
+            <a href="virusscan.html" class="nav-link">Virus Scan</a>
+            <a href="magic8ball.html" class="nav-link">Magic 8-Ball</a>
+            <a href="excuses.html" class="nav-link">Excuses</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Games</h3>
+            <a href="squarejump.html" class="nav-link">Square Jump</a>
+            <a href="scratch.html" class="nav-link">Flap Me Bird</a>
+            <a href="button.html" class="nav-link">Useless Button</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Other</h3>
+            <a href="asciiart.html" class="nav-link">ASCII Art</a>
+            <a href="cube3d.html" class="nav-link">3D Cube</a>
+            <a href="hacker.html" class="nav-link">Terminal</a>
+            <a href="pi.html" class="nav-link">Pi Digits</a>
+            <a href="loading.html" class="nav-link">Loading</a>
+        </div>
+    </div>
+    
+    <div id="menu">
+        <h1>Square Jump</h1>
+        <h2>Select a Level</h2>
+        <div class="level-select" onclick="selectLevel('Radio Happiness', 5)">
+            <div class="level-name">Radio Happiness</div>
+            <div class="level-difficulty">★☆☆☆☆</div>
+        </div>
+        <div class="level-select" onclick="selectLevel('Off The Rails', 7)">
+            <div class="level-name">Off The Rails</div>
+            <div class="level-difficulty">★★☆☆☆</div>
+        </div>
+        <div class="level-select" onclick="selectLevel('Not A Ghost', 9)">
+            <div class="level-name">Not A Ghost</div>
+            <div class="level-difficulty">★★★☆☆</div>
+        </div>
+        <div class="level-select" onclick="selectLevel('Get A Refill', 11)">
+            <div class="level-name">Get A Refill</div>
+            <div class="level-difficulty">★★★★☆</div>
+        </div>
+        
+        <div id="leaderboardSection">
+            <h2>Leaderboards</h2>
+            <div class="leaderboard">
+                <h3>Radio Happiness</h3>
+                <div id="leaderboard-Radio Happiness"></div>
+            </div>
+            <div class="leaderboard">
+                <h3>Off The Rails</h3>
+                <div id="leaderboard-Off The Rails"></div>
+            </div>
+            <div class="leaderboard">
+                <h3>Not A Ghost</h3>
+                <div id="leaderboard-Not A Ghost"></div>
+            </div>
+            <div class="leaderboard">
+                <h3>Get A Refill</h3>
+                <div id="leaderboard-Get A Refill"></div>
+            </div>
+        </div>
+        
+        <br><br>
+        <a href="index.html">Back to Home</a>
+    </div>
+
+    <div id="gameScreen" style="display: none;">
+        <h1 style="text-align: center;">Square Jump</h1>
+        <div id="currentLevel"></div>
+        <p style="text-align: center;">Press SPACE or click to jump!</p>
+        <div id="score">Score: 0</div>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="gameOver">
+            <p>GAME OVER!</p>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <div id="nameEntry">
+                <p>Enter your name for the leaderboard:</p>
+                <input type="text" id="playerName" maxlength="20" placeholder="Your Name">
+                <br>
+                <button onclick="submitScore()">Submit Score</button>
+            </div>
+            <button onclick="restart()">Restart</button>
+            <button onclick="backToMenu()">Back to Menu</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let currentLevelName = '';
+        let baseSpeed = 5;
+        let leaderboards = {};
+
+        let player = {
+            x: 100,
+            y: 300,
+            width: 30,
+            height: 30,
+            velocityY: 0,
+            gravity: 0.8,
+            jumpPower: -15,
+            onGround: false
+        };
+
+        let obstacles = [];
+        let score = 0;
+        let gameRunning = false;
+        let obstacleSpeed = 5;
+        let frameCount = 0;
+        let scoreSubmitted = false;
+
+        function loadLeaderboards() {
+            const saved = localStorage.getItem('squarejump_leaderboards');
+            if (saved) {
+                leaderboards = JSON.parse(saved);
+            } else {
+                leaderboards = {
+                    'Radio Happiness': [],
+                    'Off The Rails': [],
+                    'Not A Ghost': [],
+                    'Get A Refill': []
+                };
+            }
+            
+            const ownerScore = {
+                name: 'i own this so i can do this hehe',
+                score: 346782364782364
+            };
+            
+            for (let level in leaderboards) {
+                leaderboards[level] = leaderboards[level].filter(entry => 
+                    entry.name !== 'i own this so i can do this hehe'
+                );
+                
+                leaderboards[level].unshift(ownerScore);
+            }
+            
+            saveLeaderboards();
+            displayLeaderboards();
+        }
+
+        function saveLeaderboards() {
+            localStorage.setItem('squarejump_leaderboards', JSON.stringify(leaderboards));
+        }
+
+        function displayLeaderboards() {
+            for (let level in leaderboards) {
+                const container = document.getElementById('leaderboard-' + level);
+                if (container) {
+                    const scores = leaderboards[level];
+                    if (scores.length === 0) {
+                        container.innerHTML = '<div class="leaderboard-entry">No scores yet!</div>';
+                    } else {
+                        container.innerHTML = '';
+                        scores.slice(0, 6).forEach((entry, index) => {
+                            const div = document.createElement('div');
+                            div.className = 'leaderboard-entry' + (index === 0 ? ' top' : '');
+                            div.textContent = `${index + 1}. ${entry.name}: ${entry.score}`;
+                            container.appendChild(div);
+                        });
+                    }
+                }
+            }
+        }
+
+        function submitScore() {
+            const name = document.getElementById('playerName').value.trim();
+            if (!name) {
+                alert('Please enter your name!');
+                return;
+            }
+
+            if (!leaderboards[currentLevelName]) {
+                leaderboards[currentLevelName] = [];
+            }
+
+            leaderboards[currentLevelName].push({
+                name: name,
+                score: score
+            });
+
+            const ownerEntry = leaderboards[currentLevelName].find(entry => 
+                entry.name === 'i own this so i can do this hehe'
+            );
+            
+            leaderboards[currentLevelName] = leaderboards[currentLevelName].filter(entry =>
+                entry.name !== 'i own this so i can do this hehe'
+            );
+            
+            leaderboards[currentLevelName].sort((a, b) => b.score - a.score);
+            leaderboards[currentLevelName] = leaderboards[currentLevelName].slice(0, 9);
+            
+            if (ownerEntry) {
+                leaderboards[currentLevelName].unshift(ownerEntry);
+            }
+
+            saveLeaderboards();
+            displayLeaderboards();
+
+            document.getElementById('nameEntry').style.display = 'none';
+            scoreSubmitted = true;
+            alert('Score submitted! Check the leaderboard in the menu!');
+        }
+
+        function selectLevel(levelName, speed) {
+            currentLevelName = levelName;
+            baseSpeed = speed;
+            obstacleSpeed = speed;
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('currentLevel').style.display = 'block';
+            document.getElementById('currentLevel').textContent = 'Level: ' + levelName;
+            document.getElementById('score').style.display = 'block';
+            restart();
+        }
+
+        function backToMenu() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('nameEntry').style.display = 'none';
+            gameRunning = false;
+            displayLeaderboards();
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            ctx.fillStyle = '#000';
+            ctx.fillRect(player.x + 8, player.y + 10, 5, 5);
+            ctx.fillRect(player.x + 17, player.y + 10, 5, 5);
+            ctx.fillRect(player.x + 10, player.y + 20, 10, 3);
+        }
+
+        function drawObstacle(obs) {
+            if (obs.type === 'spike') {
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.moveTo(obs.x, obs.y + obs.height);
+                ctx.lineTo(obs.x + obs.width / 2, obs.y);
+                ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.fillStyle = '#ff00ff';
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            }
+        }
+
+        function drawGround() {
+            ctx.fillStyle = '#444';
+            ctx.fillRect(0, 350, canvas.width, 50);
+            
+            ctx.strokeStyle = '#666';
+            for (let i = 0; i < canvas.width; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(i, 350);
+                ctx.lineTo(i, 400);
+                ctx.stroke();
+            }
+        }
+
+        function createObstacle() {
+            const types = ['spike', 'block'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            if (type === 'spike') {
+                obstacles.push({
+                    x: canvas.width,
+                    y: 320,
+                    width: 30,
+                    height: 30,
+                    type: 'spike'
+                });
+            } else {
+                obstacles.push({
+                    x: canvas.width,
+                    y: 310,
+                    width: 30,
+                    height: 40,
+                    type: 'block'
+                });
+            }
+        }
+
+        function updatePlayer() {
+            player.velocityY += player.gravity;
+            player.y += player.velocityY;
+
+            if (player.y >= 300) {
+                player.y = 300;
+                player.velocityY = 0;
+                player.onGround = true;
+            } else {
+                player.onGround = false;
+            }
+        }
+
+        function updateObstacles() {
+            obstacles.forEach((obs, index) => {
+                obs.x -= obstacleSpeed;
+
+                if (obs.x + obs.width < 0) {
+                    obstacles.splice(index, 1);
+                    score++;
+                    document.getElementById('score').textContent = 'Score: ' + score;
+                    
+                    if (score % 10 === 0) {
+                        obstacleSpeed += 0.5;
+                    }
+                }
+            });
+
+            frameCount++;
+            if (frameCount % 90 === 0) {
+                createObstacle();
+            }
+        }
+
+        function checkCollision() {
+            for (let obs of obstacles) {
+                if (player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y) {
+                    gameOver();
+                }
+            }
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('finalScore').textContent = score;
+            
+            if (!scoreSubmitted && score > 0) {
+                document.getElementById('nameEntry').style.display = 'block';
+                document.getElementById('playerName').value = '';
+            }
+        }
+
+        function restart() {
+            player.y = 300;
+            player.velocityY = 0;
+            obstacles = [];
+            score = 0;
+            obstacleSpeed = baseSpeed;
+            frameCount = 0;
+            gameRunning = true;
+            scoreSubmitted = false;
+            document.getElementById('score').textContent = 'Score: 0';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('nameEntry').style.display = 'none';
+            gameLoop();
+        }
+
+        function jump() {
+            if (player.onGround && gameRunning) {
+                player.velocityY = player.jumpPower;
+            }
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawGround();
+            drawPlayer();
+            
+            obstacles.forEach(obs => drawObstacle(obs));
+
+            updatePlayer();
+            updateObstacles();
+            checkCollision();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                jump();
+            }
+        });
+
+        canvas.addEventListener('click', jump);
+
+        loadLeaderboards();
+    </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nicholas's Website</title>
+    <h1>Aiden is BANNED PERMANENTLY</h1>
+    <h2>Yes, thats you AIDEN. NO GOING ON MY WEBSITE, OK?!!</h2>
+    <h1>YOU ARE STILL BANNED AIDEN JANG THATS YOU DONT EVEN MAKE ANY EXCUSES YOU ARE BANNED FOREVER</h1>
+</head>
+<body>
+    <p>welcome to nicholas's website</p>
+    <p>Version 2.12days.1.2 | 12 days of updates - day 1, drop 3</p>
+    
+    <div id="hackerBox" style="border: 2px solid #ff0000; padding: 10px; background: #000; color: #0f0;">
+        <p id="hackerMessage">Loading...</p>
+    </div>
+    
+    <p>Welcome to My secret site! Don't tell anyone, or else! I hope you never see this site again unless you are me! Seriously, though, there is nothing else besides this on here. okay, that starting message is a bit outdated, so i should probably change it soon, but whatever for now. day 1 was based on john's request to let the hacker terminal change the main site, so here you go. also, it saves for everyone. that was drop 2. drop 1 was all local on the hacker box. drop 3 auto updated the hacker box, so no more need for absurdly large links or whetever. that's it for today! come back tomorrow for an even better suprise!</p>
+    <p id="userInfo"></p>
+    <br>
+    <p><a href="#" onclick="return handleClick('weatherprank.html')">Check Weather</a></p>
+    <p><a href="#" onclick="return handleClick('calculator.html')">Calculator</a></p>
+    <p><a href="#" onclick="return handleClick('downloadram.html')">Download More RAM</a></p>
+    <p><a href="#" onclick="return handleClick('loading.html')">Loading</a></p>
+    <p><a href="#" onclick="return handleClick('virusscan.html')">Virus Scanner</a></p>
+    <p><a href="#" onclick="return handleClick('magic8ball.html')">Magic 8-Ball</a></p>
+    <p><a href="#" onclick="return handleClick('button.html')">Useless Button</a></p>
+    <p><a href="#" onclick="return handleClick('login.html')">Secret Login</a></p>
+    <p><a href="#" onclick="return handleClick('asciiart.html')">ASCII Art Gallery</a></p>
+    <p><a href="#" onclick="return handleClick('excuses.html')">Excuse Generator</a></p>
+    <p><a href="#" onclick="return handleClick('hacker.html')">Hacker Terminal</a></p>
+    <p><a href="#" onclick="return handleClick('cube3d.html')">3D ASCII Cube</a></p>
+    <p><a href="#" onclick="return handleClick('squarejump.html')">Square Jump</a></p>
+    
+    <div id="loadingScreen" style="display: none;">
+        <h2>Loading...</h2>
+    </div>
+    
+    <pre>
+       _____                            
+      /     \                                                      .--------.
+     |  O   O|                                                    | .----. |
+     |   >   |                                                    ||o ()o ||
+      \_____/                                                     || (::) ||
+        |||                                                       | '--o-' |
+       /|||\____                                                   '--------'
+      / |||     )===>  *  *  *  *  *  *  *  *  *  *  *  *
+     |  |||                                        
+     |  |||                                        
+       /   \                                       
+      /     \                                       
+     /       \
+    </pre>
+
+    <script>
+        const loggedInUser = localStorage.getItem('logged_in_user');
+        const guestMode = localStorage.getItem('guest_mode');
+        let reminderInterval;
+        
+        // Function to load message from PHP backend
+        function loadMessage() {
+            fetch('getmessage.php?t=' + new Date().getTime())
+                .then(response => response.text())
+                .then(message => {
+                    document.getElementById('hackerMessage').textContent = message;
+                })
+                .catch(error => {
+                    document.getElementById('hackerMessage').textContent = 'Aiden is BANNED FOREVER';
+                });
+        }
+        
+        // Load message initially
+        loadMessage();
+        
+        // Auto-refresh message every 5 seconds
+        setInterval(loadMessage, 5000);
+        
+        // Redirect to login if not logged in and not guest
+        if (!loggedInUser && !guestMode) {
+            window.location.href = 'login.html';
+        }
+        
+        // Display user info
+        if (loggedInUser) {
+            document.getElementById('userInfo').innerHTML = 'Logged in as: ' + loggedInUser + ' | <a href="#" onclick="logout()">Logout</a>';
+        } else {
+            document.getElementById('userInfo').innerHTML = '<a href="login.html">Log in for better loading times!</a>';
+            
+            // Start reminder popup for guests
+            reminderInterval = setInterval(() => {
+                alert('Sign up or log in for instant access to all pages!');
+            }, 5000);
+        }
+        
+        function logout() {
+            localStorage.removeItem('logged_in_user');
+            localStorage.removeItem('guest_mode');
+            window.location.href = 'login.html';
+        }
+        
+        function handleClick(url) {
+            document.getElementById('loadingScreen').style.display = 'block';
+            
+            if (loggedInUser) {
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 500);
+                return false;
+            }
+            
+            setTimeout(() => {
+                window.location.href = url;
+            }, 30000);
+            
+            return false;
+        }
+    </script>
+</body>
+</html>

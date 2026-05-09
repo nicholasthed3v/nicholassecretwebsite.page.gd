@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Game - Nicholas's Website</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #ddd;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Hamburger sidebar */
+        .hamburger {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 200;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 8px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .hamburger span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #aaa;
+        }
+        .hamburger:hover span { background: #fff; }
+
+        .sidebar {
+            position: fixed;
+            left: -240px;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 20px 15px;
+            overflow-y: auto;
+            z-index: 100;
+            transition: left 0.2s ease;
+        }
+        .sidebar.open { left: 0; }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 50;
+        }
+        .overlay.open { display: block; }
+
+        .logo { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .version { font-size: 11px; color: #666; margin-bottom: 25px; }
+
+        .nav-section { margin-bottom: 20px; }
+        .nav-section h3 {
+            font-size: 11px; color: #555;
+            text-transform: uppercase; margin-bottom: 8px; font-weight: normal;
+        }
+        .nav-link {
+            display: block; color: #aaa; text-decoration: none;
+            padding: 8px 10px; margin: 3px 0; font-size: 13px;
+            border-left: 2px solid transparent;
+        }
+        .nav-link:hover { background: #111; border-left-color: #444; color: #fff; }
+        .nav-link.members { color: #886633; }
+        .nav-link.members:hover { border-left-color: #664400; color: #bb9944; }
+        .nav-link.active { border-left-color: #555; color: #fff; background: #111; }
+
+        /* Game layout */
+        .game-wrap {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px 8px 52px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #222;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .element-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            border: 1px solid #333;
+            background: #111;
+            color: #aaa;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        .element-btn:hover { border-color: #555; color: #fff; }
+        .element-btn.selected { border-color: #888; color: #fff; background: #1a1a1a; }
+
+        .brush-label {
+            font-size: 11px; color: #555; margin-left: 8px;
+        }
+        .brush-slider {
+            -webkit-appearance: none;
+            width: 80px; height: 4px;
+            background: #333; outline: none; cursor: pointer;
+        }
+        .brush-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px; height: 12px;
+            background: #888; cursor: pointer;
+        }
+
+        .clear-btn {
+            padding: 5px 10px; font-size: 12px;
+            border: 1px solid #553333; background: #1a0a0a;
+            color: #aa5555; cursor: pointer; margin-left: auto;
+        }
+        .clear-btn:hover { border-color: #aa5555; color: #ff7777; }
+
+        canvas {
+            display: block;
+            flex: 1;
+            cursor: crosshair;
+            image-rendering: pixelated;
+        }
+
+        .status-bar {
+            padding: 4px 12px;
+            background: #0a0a0a;
+            border-top: 1px solid #222;
+            font-size: 11px;
+            color: #444;
+            font-family: 'Courier New', monospace;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hamburger -->
+<div class="hamburger" onclick="toggleSidebar()" id="hamburger">
+    <span></span><span></span><span></span>
+</div>
+
+<!-- Sidebar overlay -->
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="sidebar" id="sidebar">
+    <div class="logo">Nicholas's Website</div>
+    <div class="version">v5.0 BETA</div>
+
+    <div class="nav-section">
+        <h3>Tools</h3>
+        <a href="weatherprank.html" class="nav-link">Weather</a>
+        <a href="calculator.html" class="nav-link">Calculator</a>
+        <a href="downloadram.html" class="nav-link">Download RAM</a>
+        <a href="virusscan.html" class="nav-link">Virus Scan</a>
+        <a href="excuses.html" class="nav-link">Excuses</a>
+        <a href="magic8ball.html" class="nav-link">Magic 8-Ball</a>
+    </div>
+
+    <div class="nav-section">
+        <h3>Games</h3>
+        <a href="button.html" class="nav-link">Useless Button</a>
+        <a href="originalparticlegamenotstolenatall.html" class="nav-link active">Particle Game (beta)</a>
+    </div>
+
+    <div class="nav-section">
+        <h3>Members Only</h3>
+        <a href="squarejump.html" class="nav-link members">Square Jump</a>
+        <a href="scratch.html" class="nav-link members">Flap Me Bird</a>
+        <a href="hacker.html" class="nav-link members">Terminal</a>
+    </div>
+
+    <div class="nav-section">
+        <h3>Other</h3>
+        <a href="asciiart.html" class="nav-link">ASCII Art</a>
+        <a href="cube3d.html" class="nav-link">3D Cube</a>
+        <a href="pi.html" class="nav-link">Pi Digits</a>
+        <a href="loading.html" class="nav-link">Loading</a>
+        <a href="ggggg.html" class="nav-link">Click here for a special suprise!</a>
+    </div>
+</div>
+
+<!-- Game -->
+<div class="game-wrap">
+    <div class="top-bar" id="topBar">
+        <!-- buttons injected by JS -->
+    </div>
+    <canvas id="canvas"></canvas>
+    <div class="status-bar" id="statusBar">particles: 0 | hover to inspect</div>
+</div>
+
+<script>
+const ELEMENTS = {
+    sand:   { color: [194,178,128], density: 3, powder: true,  liquid: false, gas: false, label: '🟨 Sand' },
+    water:  { color: [40,120,220],  density: 2, powder: false, liquid: true,  gas: false, label: '💧 Water' },
+    fire:   { color: [220,80,20],   density: 0, powder: false, liquid: false, gas: true,  label: '🔥 Fire',   life: 40 },
+    wood:   { color: [120,80,40],   density: 10,powder: false, liquid: false, gas: false, label: '🪵 Wood',   solid: true, flammable: true },
+    stone:  { color: [130,130,130], density: 10,powder: false, liquid: false, gas: false, label: '🪨 Stone',  solid: true },
+    oil:    { color: [80,60,20],    density: 1, powder: false, liquid: true,  gas: false, label: '🛢 Oil',    flammable: true },
+    lava:   { color: [230,100,10],  density: 5, powder: false, liquid: true,  gas: false, label: '🌋 Lava',   hot: true },
+    ice:    { color: [180,220,255], density: 10,powder: false, liquid: false, gas: false, label: '🧊 Ice',    solid: true, cold: true },
+    smoke:  { color: [80,80,80],    density: 0, powder: false, liquid: false, gas: true,  label: '💨 Smoke',  life: 120 },
+    steam:  { color: [180,200,220], density: 0, powder: false, liquid: false, gas: true,  label: '♨️ Steam',  life: 100 },
+    acid:   { color: [100,220,50],  density: 2, powder: false, liquid: true,  gas: false, label: '🧪 Acid',   corrosive: true },
+    seed:   { color: [100,160,60],  density: 3, powder: true,  liquid: false, gas: false, label: '🌱 Seed',   grows: true },
+    plant:  { color: [40,140,40],   density: 10,powder: false, liquid: false, gas: false, label: '🌿 Plant',  solid: true, flammable: true },
+    person: { color: [255,200,150], density: 4, powder: false, liquid: false, gas: false, label: '🧍 Person', agent: true },
+    food:   { color: [220,160,80],  density: 3, powder: true,  liquid: false, gas: false, label: '🍞 Food' },
+    eraser: { color: null,          density: 0, powder: false, liquid: false, gas: false, label: '🧹 Erase',  eraser: true },
+    wall:   { color: [60,60,60],    density: 10,powder: false, liquid: false, gas: false, label: '⬛ Wall',   solid: true },
+    snow:   { color: [230,240,255], density: 2, powder: true,  liquid: false, gas: false, label: '❄️ Snow',   cold: true },
+    gunpowder: { color: [50,50,50], density: 3, powder: true,  liquid: false, gas: false, label: '💣 Powder', explosive: true },
+};
+
+const CELL = 4;
+let cols, rows, grid, nextGrid;
+let selectedEl = 'sand';
+let brushSize = 3;
+let isDrawing = false;
+let mouseX = 0, mouseY = 0;
+let frameCount = 0;
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+function initGrid() {
+    cols = Math.floor(canvas.width / CELL);
+    rows = Math.floor(canvas.height / CELL);
+    grid = new Array(cols * rows).fill(null);
+    nextGrid = new Array(cols * rows).fill(null);
+}
+
+function idx(x, y) { return y * cols + x; }
+function inBounds(x, y) { return x >= 0 && x < cols && y >= 0 && y < rows; }
+
+function makeParticle(type) {
+    const el = ELEMENTS[type];
+    const c = el.color;
+    // slight color variation
+    const v = () => Math.floor((Math.random()-0.5)*20);
+    return {
+        type,
+        r: Math.min(255, Math.max(0, c[0]+v())),
+        g: Math.min(255, Math.max(0, c[1]+v())),
+        b: Math.min(255, Math.max(0, c[2]+v())),
+        life: el.life ? el.life + Math.floor(Math.random()*20) : 0,
+        vx: 0, vy: 0,
+        // person AI state
+        hunger: type === 'person' ? 100 : 0,
+        dx: Math.random() < 0.5 ? -1 : 1,
+        timer: Math.floor(Math.random()*30),
+    };
+}
+
+function spawnAt(px, py) {
+    const gx = Math.floor(px / CELL);
+    const gy = Math.floor(py / CELL);
+    for (let dy = -brushSize; dy <= brushSize; dy++) {
+        for (let dx = -brushSize; dx <= brushSize; dx++) {
+            if (dx*dx + dy*dy > brushSize*brushSize) continue;
+            const nx = gx+dx, ny = gy+dy;
+            if (!inBounds(nx, ny)) continue;
+            if (ELEMENTS[selectedEl].eraser) {
+                grid[idx(nx, ny)] = null;
+            } else if (!grid[idx(nx, ny)] || Math.random() < 0.3) {
+                grid[idx(nx, ny)] = makeParticle(selectedEl);
+            }
+        }
+    }
+}
+
+function update() {
+    frameCount++;
+    for (let i = 0; i < grid.length; i++) nextGrid[i] = null;
+
+    // iterate bottom-up for gravity, random left-right
+    for (let y = rows-1; y >= 0; y--) {
+        const leftRight = Math.random() < 0.5;
+        for (let xi = 0; xi < cols; xi++) {
+            const x = leftRight ? xi : cols-1-xi;
+            const p = grid[idx(x, y)];
+            if (!p || nextGrid[idx(x, y)] === '__moved__') continue;
+
+            const el = ELEMENTS[p.type];
+            let moved = false;
+
+            // Life decay
+            if (p.life > 0) {
+                p.life--;
+                if (p.life <= 0) {
+                    // fire -> smoke, steam fades
+                    if (p.type === 'fire') {
+                        nextGrid[idx(x, y)] = makeParticle('smoke');
+                    }
+                    continue;
+                }
+            }
+
+            // --- PERSON AI ---
+            if (el.agent) {
+                p.hunger -= 0.02;
+                p.timer--;
+
+                // look for food nearby
+                let foundFood = false;
+                for (let fy = y-3; fy <= y+3 && !foundFood; fy++) {
+                    for (let fx = x-3; fx <= x+3 && !foundFood; fx++) {
+                        if (!inBounds(fx, fy)) continue;
+                        const fp = grid[idx(fx, fy)];
+                        if (fp && fp.type === 'food') {
+                            // move toward food
+                            p.dx = fx > x ? 1 : fx < x ? -1 : p.dx;
+                            // eat if adjacent
+                            if (Math.abs(fx-x) <= 1 && Math.abs(fy-y) <= 1) {
+                                grid[idx(fx, fy)] = null;
+                                p.hunger = Math.min(100, p.hunger + 40);
+                                foundFood = true;
+                            }
+                        }
+                    }
+                }
+
+                // random direction change
+                if (p.timer <= 0) {
+                    p.dx = Math.random() < 0.5 ? -1 : 1;
+                    p.timer = 15 + Math.floor(Math.random()*30);
+                }
+
+                // try to walk
+                const nx = x + p.dx;
+                const ny = y;
+                const below = y + 1;
+
+                // gravity - fall if nothing below
+                if (inBounds(x, below) && !grid[idx(x, below)] && !nextGrid[idx(x, below)]) {
+                    nextGrid[idx(x, below)] = p;
+                    moved = true;
+                } else if (inBounds(nx, y) && !grid[idx(nx, y)] && !nextGrid[idx(nx, y)]) {
+                    nextGrid[idx(nx, y)] = p;
+                    moved = true;
+                } else {
+                    // try jumping up a step
+                    if (inBounds(nx, y-1) && !grid[idx(nx, y-1)] && !nextGrid[idx(nx, y-1)]) {
+                        nextGrid[idx(nx, y-1)] = p;
+                        moved = true;
+                    } else {
+                        p.dx *= -1;
+                    }
+                }
+
+                // starving - die
+                if (p.hunger <= 0) { moved = true; } // disappear
+
+                if (!moved) nextGrid[idx(x, y)] = p;
+                continue;
+            }
+
+            // --- FIRE spread ---
+            if (p.type === 'fire') {
+                // spread to flammable neighbors
+                const neighbors = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1]];
+                for (const [dx,dy] of neighbors) {
+                    const nx=x+dx, ny=y+dy;
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (np && ELEMENTS[np.type].flammable && Math.random() < 0.02) {
+                        grid[idx(nx,ny)] = makeParticle('fire');
+                    }
+                    // lava ignites too
+                    if (np && np.type === 'gunpowder' && Math.random() < 0.05) {
+                        grid[idx(nx,ny)] = makeParticle('fire');
+                        // small explosion
+                        for (let ey=-2;ey<=2;ey++) for (let ex=-2;ex<=2;ex++) {
+                            if (inBounds(nx+ex,ny+ey) && Math.random()<0.5)
+                                grid[idx(nx+ex,ny+ey)] = makeParticle('fire');
+                        }
+                    }
+                }
+                // rise upward
+                if (inBounds(x, y-1) && !grid[idx(x,y-1)] && Math.random()<0.6) {
+                    nextGrid[idx(x,y-1)] = p; moved=true;
+                } else if (inBounds(x+(Math.random()<0.5?-1:1), y-1)) {
+                    const rx = x+(Math.random()<0.5?-1:1);
+                    if (inBounds(rx,y-1) && !grid[idx(rx,y-1)] && Math.random()<0.4) {
+                        nextGrid[idx(rx,y-1)] = p; moved=true;
+                    }
+                }
+                if (!moved) nextGrid[idx(x,y)] = p;
+                continue;
+            }
+
+            // --- LAVA ---
+            if (p.type === 'lava') {
+                // ignite neighbors
+                for (const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                    const nx=x+dx, ny=y+dy;
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (np && ELEMENTS[np.type].flammable && Math.random()<0.01)
+                        grid[idx(nx,ny)] = makeParticle('fire');
+                    if (np && np.type==='water') {
+                        grid[idx(nx,ny)] = makeParticle('steam');
+                        grid[idx(x,y)] = makeParticle('stone');
+                        moved = true; break;
+                    }
+                    if (np && np.type==='ice') {
+                        grid[idx(nx,ny)] = makeParticle('water');
+                    }
+                }
+            }
+
+            // --- ACID ---
+            if (p.type === 'acid') {
+                for (const [dx,dy] of [[-1,0],[1,0],[0,1],[0,-1]]) {
+                    const nx=x+dx, ny=y+dy;
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (np && np.type !== 'acid' && np.type !== 'glass' && !el.gas && Math.random()<0.02) {
+                        grid[idx(nx,ny)] = null;
+                        if (Math.random()<0.3) grid[idx(x,y)] = null; // acid consumed
+                        moved = true; break;
+                    }
+                }
+            }
+
+            // --- WATER melts ice ---
+            if (p.type === 'water') {
+                for (const [dx,dy] of [[-1,0],[1,0],[0,1],[0,-1]]) {
+                    const nx=x+dx, ny=y+dy;
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (np && np.type==='ice' && Math.random()<0.001)
+                        grid[idx(nx,ny)] = makeParticle('water');
+                }
+            }
+
+            // --- SEED grows into plant ---
+            if (p.type === 'seed') {
+                // needs water nearby
+                let hasWater = false;
+                for (const [dx,dy] of [[-1,0],[1,0],[0,1],[0,-1]]) {
+                    const np = grid[idx(x+dx,y+dy)];
+                    if (np && np.type==='water') { hasWater=true; break; }
+                }
+                if (hasWater && Math.random()<0.002) {
+                    grid[idx(x,y)] = makeParticle('plant');
+                    // grow a few cells up
+                    for (let h=1; h<=3+Math.floor(Math.random()*3); h++) {
+                        if (inBounds(x,y-h) && !grid[idx(x,y-h)])
+                            grid[idx(x,y-h)] = makeParticle('plant');
+                    }
+                    continue;
+                }
+            }
+
+            // --- SNOW: cold, melts near fire/lava ---
+            if (p.type === 'snow') {
+                for (const [dx,dy] of [[-1,0],[1,0],[0,1],[0,-1]]) {
+                    const nx=x+dx,ny=y+dy;
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (np && (np.type==='fire'||np.type==='lava') && Math.random()<0.05) {
+                        grid[idx(x,y)] = makeParticle('water');
+                        moved=true; break;
+                    }
+                }
+                if (moved) continue;
+            }
+
+            // --- GAS: rise ---
+            if (el.gas) {
+                const dirs = [[0,-1],[-1,-1],[1,-1],[-1,0],[1,0]];
+                for (const [dx,dy] of dirs) {
+                    const nx=x+dx,ny=y+dy;
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (!np && Math.random()<0.4) {
+                        nextGrid[idx(nx,ny)] = p; moved=true; break;
+                    }
+                }
+                if (!moved) nextGrid[idx(x,y)] = p;
+                continue;
+            }
+
+            // --- LIQUID ---
+            if (el.liquid) {
+                const below = y+1;
+                const bleft = x-1, bright = x+1;
+                const tries = [
+                    [x, below],
+                    [bleft, below], [bright, below],
+                    [bleft, y], [bright, y]
+                ];
+                for (const [nx,ny] of tries) {
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (!np) {
+                        nextGrid[idx(nx,ny)] = p; moved=true; break;
+                    } else if (ELEMENTS[np.type] && ELEMENTS[np.type].density < el.density && !nextGrid[idx(nx,ny)]) {
+                        nextGrid[idx(nx,ny)] = p;
+                        nextGrid[idx(x,y)] = np;
+                        moved=true; break;
+                    }
+                }
+                if (!moved) nextGrid[idx(x,y)] = p;
+                continue;
+            }
+
+            // --- POWDER ---
+            if (el.powder) {
+                const tries = [
+                    [x, y+1],
+                    [x-1, y+1], [x+1, y+1]
+                ];
+                for (const [nx,ny] of tries) {
+                    if (!inBounds(nx,ny)) continue;
+                    const np = grid[idx(nx,ny)];
+                    if (!np) {
+                        nextGrid[idx(nx,ny)] = p; moved=true; break;
+                    } else if (ELEMENTS[np.type] && ELEMENTS[np.type].liquid && !nextGrid[idx(nx,ny)]) {
+                        nextGrid[idx(nx,ny)] = p;
+                        nextGrid[idx(x,y)] = np;
+                        moved=true; break;
+                    }
+                }
+                if (!moved) nextGrid[idx(x,y)] = p;
+                continue;
+            }
+
+            // solid / default: stay
+            nextGrid[idx(x,y)] = p;
+        }
+    }
+
+    // swap
+    const tmp = grid; grid = nextGrid; nextGrid = tmp;
+}
+
+function render() {
+    const imgData = ctx.createImageData(canvas.width, canvas.height);
+    const d = imgData.data;
+    let count = 0;
+
+    for (let y=0; y<rows; y++) {
+        for (let x=0; x<cols; x++) {
+            const p = grid[idx(x,y)];
+            if (!p) continue;
+            count++;
+            // flicker for fire/lava
+            let r=p.r,g=p.g,b=p.b;
+            if (p.type==='fire') {
+                const flicker = Math.random()*40-20;
+                r=Math.min(255,r+flicker); g=Math.max(0,g+flicker*0.3);
+            }
+            if (p.type==='lava' && frameCount%2===0) {
+                r=Math.min(255,r+20);
+            }
+            // dim smoke by life
+            if (p.type==='smoke'||p.type==='steam') {
+                const fade = p.life/120;
+                r*=fade; g*=fade; b*=fade;
+            }
+            // person color based on hunger
+            if (p.type==='person') {
+                if (p.hunger < 30) { r=200; g=50; b=50; }
+            }
+
+            for (let py=0;py<CELL;py++) {
+                for (let px=0;px<CELL;px++) {
+                    const pi = ((y*CELL+py)*canvas.width + (x*CELL+px))*4;
+                    d[pi]   = r;
+                    d[pi+1] = g;
+                    d[pi+2] = b;
+                    d[pi+3] = 255;
+                }
+            }
+        }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+    document.getElementById('statusBar').textContent =
+        `particles: ${count} | element: ${selectedEl} | brush: ${brushSize*2+1}px`;
+}
+
+function loop() {
+    update();
+    render();
+    requestAnimationFrame(loop);
+}
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 
+        document.getElementById('topBar').offsetHeight - 24;
+    initGrid();
+}
+
+// Build element buttons
+function buildButtons() {
+    const bar = document.getElementById('topBar');
+    bar.innerHTML = '';
+    for (const [key, el] of Object.entries(ELEMENTS)) {
+        const btn = document.createElement('button');
+        btn.className = 'element-btn' + (key===selectedEl?' selected':'');
+        btn.textContent = el.label;
+        btn.onclick = () => {
+            selectedEl = key;
+            document.querySelectorAll('.element-btn').forEach(b=>b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        bar.appendChild(btn);
+    }
+    const lbl = document.createElement('span');
+    lbl.className = 'brush-label';
+    lbl.textContent = 'brush:';
+    bar.appendChild(lbl);
+
+    const slider = document.createElement('input');
+    slider.type='range'; slider.min=1; slider.max=8; slider.value=brushSize;
+    slider.className='brush-slider';
+    slider.oninput = e => { brushSize = parseInt(e.target.value); };
+    bar.appendChild(slider);
+
+    const clr = document.createElement('button');
+    clr.className='clear-btn';
+    clr.textContent='Clear';
+    clr.onclick = () => { grid.fill(null); };
+    bar.appendChild(clr);
+}
+
+// Mouse / touch
+canvas.addEventListener('mousedown', e => { isDrawing=true; spawnAt(e.offsetX, e.offsetY); });
+canvas.addEventListener('mouseup',   () => isDrawing=false);
+canvas.addEventListener('mouseleave',() => isDrawing=false);
+canvas.addEventListener('mousemove', e => {
+    mouseX=e.offsetX; mouseY=e.offsetY;
+    if (isDrawing) spawnAt(e.offsetX, e.offsetY);
+});
+canvas.addEventListener('touchstart', e => {
+    e.preventDefault(); isDrawing=true;
+    const t=e.touches[0];
+    const r=canvas.getBoundingClientRect();
+    spawnAt(t.clientX-r.left, t.clientY-r.top);
+}, {passive:false});
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t=e.touches[0];
+    const r=canvas.getBoundingClientRect();
+    if (isDrawing) spawnAt(t.clientX-r.left, t.clientY-r.top);
+}, {passive:false});
+canvas.addEventListener('touchend', () => isDrawing=false);
+
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+}
+
+window.addEventListener('resize', () => { resize(); });
+
+buildButtons();
+resize();
+loop();
+</script>
+</body>
+</html>

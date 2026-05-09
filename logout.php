@@ -1,0 +1,12 @@
+<?php
+// Set session cookie parameters
+ini_set('session.cookie_lifetime', 86400);
+ini_set('session.cookie_path', '/');
+ini_set('session.cookie_secure', 0);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_samesite', 'Lax');
+session_start();
+session_destroy();
+header('Location: login.html');
+exit;
+?>

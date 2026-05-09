@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Clicker - Nicholas's Website</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #ddd;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Hamburger */
+        .hamburger {
+            position: fixed;
+            top: 12px; left: 12px;
+            z-index: 200;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 8px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .hamburger span { display: block; width: 20px; height: 2px; background: #aaa; }
+        .hamburger:hover span { background: #fff; }
+
+        .sidebar {
+            position: fixed;
+            left: -240px; top: 0;
+            width: 220px; height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 20px 15px;
+            overflow-y: auto;
+            z-index: 100;
+            transition: left 0.2s ease;
+        }
+        .sidebar.open { left: 0; }
+        .overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
+        }
+        .overlay.open { display: block; }
+
+        .logo { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .s-version { font-size: 11px; color: #666; margin-bottom: 25px; }
+        .nav-section { margin-bottom: 20px; }
+        .nav-section h3 { font-size: 11px; color: #555; text-transform: uppercase; margin-bottom: 8px; font-weight: normal; }
+        .nav-section h3.members-label { color: #664400; }
+        .nav-link { display: block; color: #aaa; text-decoration: none; padding: 8px 10px; margin: 3px 0; font-size: 13px; border-left: 2px solid transparent; }
+        .nav-link:hover { background: #111; border-left-color: #444; color: #fff; }
+        .nav-link.members { color: #886633; }
+        .nav-link.members:hover { border-left-color: #664400; color: #bb9944; }
+        .nav-link.active { border-left-color: #555; color: #fff; background: #111; }
+
+        /* Main layout */
+        .main {
+            flex: 1;
+            display: flex;
+            padding: 40px;
+            padding-left: 60px;
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Left: clicker */
+        .clicker-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding-top: 20px;
+        }
+
+        .coin-count {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 20px 40px;
+            text-align: center;
+            width: 100%;
+        }
+        .coin-count .number {
+            font-size: 42px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+        }
+        .coin-count .label {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+        }
+        .coin-count .cps {
+            font-size: 12px;
+            color: #444;
+            margin-top: 2px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .coin-btn {
+            background: #0a0a0a;
+            border: 1px solid #444;
+            color: #ddd;
+            font-size: 64px;
+            width: 140px;
+            height: 140px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: border-color 0.1s, background 0.1s;
+        }
+        .coin-btn:hover { border-color: #888; background: #111; }
+        .coin-btn:active { background: #1a1a1a; transform: scale(0.95); }
+
+        .joke-box {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 15px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            min-height: 60px;
+            line-height: 1.6;
+        }
+        .joke-box .joke-label {
+            font-size: 10px;
+            color: #444;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        /* Right: upgrades */
+        .shop-side {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 20px;
+        }
+
+        .shop-title {
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .upgrade-btn {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            color: #aaa;
+            padding: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-family: Arial, sans-serif;
+            width: 100%;
+        }
+        .upgrade-btn:hover:not(:disabled) { border-color: #555; color: #fff; background: #111; }
+        .upgrade-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .upgrade-btn .u-name { font-size: 13px; color: #ccc; }
+        .upgrade-btn .u-desc { font-size: 11px; color: #555; margin-top: 3px; }
+        .upgrade-btn .u-cost { font-size: 12px; color: #888; margin-top: 5px; font-family: 'Courier New', monospace; }
+        .upgrade-btn .u-owned { font-size: 10px; color: #444; float: right; }
+
+        .total-earned {
+            font-size: 11px;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+    <div class="logo">Nicholas's Website</div>
+    <div class="s-version">v5.0 BETA</div>
+    <div class="nav-section">
+        <h3>Tools</h3>
+        <a href="weatherprank.html" class="nav-link">Weather</a>
+        <a href="calculator.html" class="nav-link">Calculator</a>
+        <a href="downloadram.html" class="nav-link">Download RAM</a>
+        <a href="virusscan.html" class="nav-link">Virus Scan</a>
+        <a href="excuses.html" class="nav-link">Excuses</a>
+    </div>
+    <div class="nav-section">
+        <h3>Games</h3>
+        <a href="button.html" class="nav-link">Useless Button</a>
+        <a href="magic8ball.html" class="nav-link">Magic 8-Ball</a>
+        <a href="rockpixels.html" class="nav-link">Rock Pixels (beta)</a>
+        <a href="coinclicker.html" class="nav-link active">Coin Clicker</a>
+    </div>
+    <div class="nav-section">
+        <h3 class="members-label">Members Only</h3>
+        <a href="squarejump.html" class="nav-link members">Square Jump</a>
+        <a href="scratch.html" class="nav-link members">Flap Me Bird</a>
+        <a href="hacker.html" class="nav-link members">Terminal</a>
+    </div>
+    <div class="nav-section">
+        <h3>Other</h3>
+        <a href="asciiart.html" class="nav-link">ASCII Art</a>
+        <a href="cube3d.html" class="nav-link">3D Cube</a>
+        <a href="pi.html" class="nav-link">Pi Digits</a>
+        <a href="loading.html" class="nav-link">Loading</a>
+        <a href="ggggg.html" class="nav-link">Click here for a special suprise!</a>
+    </div>
+</div>
+
+<div class="main">
+    <!-- Left -->
+    <div class="clicker-side">
+        <div class="coin-count">
+            <div class="number" id="coinDisplay">0</div>
+            <div class="label">coins</div>
+            <div class="cps" id="cpsDisplay">0 coins/sec</div>
+        </div>
+
+        <button class="coin-btn" id="coinBtn" onclick="clickCoin()">🪙</button>
+
+        <div class="total-earned" id="totalEarned">total earned: 0</div>
+
+        <div class="joke-box">
+            <div class="joke-label">💬 bad joke of the click</div>
+            <div id="jokeText">Click the coin to hear a terrible joke.</div>
+        </div>
+    </div>
+
+    <!-- Right -->
+    <div class="shop-side">
+        <div class="shop-title">upgrades</div>
+        <div id="shopContainer"></div>
+    </div>
+</div>
+
+<script>
+    let coins = 0;
+    let totalEarned = 0;
+    let cps = 0;
+    let clickPower = 1;
+    let jokeIndex = 0;
+
+    const jokes = [
+        "Why did the coin go to school? To get a little change.",
+        "I told my bank I wanted to check my balance. They pushed me off a ledge.",
+        "Why don't coins ever get lonely? Because they always come in cents.",
+        "I tried to come up with a joke about money... but I came up short.",
+        "What did the penny say to the dollar? You make no cents.",
+        "Why did the coin break up with the dollar? It felt too much cents-ored.",
+        "I asked my wallet for a joke. It said it was empty.",
+        "Why are coins bad at keeping secrets? They always get flipped.",
+        "What's a coin's favorite dance? The jingle.",
+        "I lost a coin in the couch. It was spare change.",
+        "Why did the quarter go to therapy? It had too many flip-flops.",
+        "What do you call a rich coin? Wealthy... get it? No? Ok.",
+        "Why did the dime sit alone? Because it was too small to hang with the big bucks.",
+        "I invested in coins. Now I'm making cents of my life.",
+        "What's a coin collector's favorite song? Money, Money, Money. Very original.",
+        "Why did the coin fail its exam? It couldn't make cents of the questions.",
+        "A coin walks into a bar. The bartender says 'you look like change'.",
+        "I tried to catch fog today. I mist. That has nothing to do with coins but here we are.",
+        "Why did the nickel feel left out? Because everyone said it made no cents.",
+        "What do coins eat for breakfast? Cereal with 2% interest.",
+    ];
+
+    const upgrades = [
+        { id: 'finger',    name: 'Better Finger',       desc: '+1 coin per click',           baseCost: 10,   cpsBonus: 0,   clickBonus: 1,  owned: 0, joke: "upgraded your finger. wow." },
+        { id: 'piggybank', name: 'Piggy Bank',          desc: '1 coin/sec automatically',    baseCost: 50,   cpsBonus: 1,   clickBonus: 0,  owned: 0, joke: "oink oink. money." },
+        { id: 'glove',     name: 'Clicking Glove',      desc: '+3 coins per click',          baseCost: 100,  cpsBonus: 0,   clickBonus: 3,  owned: 0, joke: "a glove. for clicking. sure." },
+        { id: 'robot',     name: 'Tiny Robot',          desc: '5 coins/sec',                 baseCost: 250,  cpsBonus: 5,   clickBonus: 0,  owned: 0, joke: "beep boop. coins." },
+        { id: 'cat',       name: 'Coin Cat',            desc: 'Meows out 10 coins/sec',      baseCost: 500,  cpsBonus: 10,  clickBonus: 0,  owned: 0, joke: "the cat does not care about you." },
+        { id: 'turbo',     name: 'Turbo Thumb',         desc: '+10 coins per click',         baseCost: 750,  cpsBonus: 0,   clickBonus: 10, owned: 0, joke: "your thumb is now turbo." },
+        { id: 'mine',      name: 'Coin Mine',           desc: '25 coins/sec',                baseCost: 1500, cpsBonus: 25,  clickBonus: 0,  owned: 0, joke: "mining coins. totally legal." },
+        { id: 'wizard',    name: 'Coin Wizard',         desc: 'Magics 50 coins/sec',         baseCost: 3000, cpsBonus: 50,  clickBonus: 0,  owned: 0, joke: "he refuses to explain how." },
+        { id: 'laser',     name: 'Laser Finger',        desc: '+25 coins per click',         baseCost: 4000, cpsBonus: 0,   clickBonus: 25, owned: 0, joke: "pew pew. coins." },
+        { id: 'bank',      name: 'Actual Bank',         desc: '100 coins/sec',               baseCost: 8000, cpsBonus: 100, clickBonus: 0,  owned: 0, joke: "you own a bank now. cool i guess." },
+        { id: 'printer',   name: 'Money Printer',       desc: '250 coins/sec (totally fine)', baseCost: 20000, cpsBonus: 250, clickBonus: 0, owned: 0, joke: "the government is watching." },
+        { id: 'blackhole', name: 'Coin Black Hole',     desc: 'Sucks in 500 coins/sec',      baseCost: 50000, cpsBonus: 500, clickBonus: 0, owned: 0, joke: "coins go in. nothing comes out." },
+    ];
+
+    function getCost(u) {
+        return Math.floor(u.baseCost * Math.pow(1.5, u.owned));
+    }
+
+    function formatNum(n) {
+        if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+        if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+        if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+        return Math.floor(n).toString();
+    }
+
+    function clickCoin() {
+        coins += clickPower;
+        totalEarned += clickPower;
+        jokeIndex = (jokeIndex + 1) % jokes.length;
+        document.getElementById('jokeText').textContent = jokes[jokeIndex];
+        updateDisplay();
+    }
+
+    function buyUpgrade(id) {
+        const u = upgrades.find(u => u.id === id);
+        const cost = getCost(u);
+        if (coins < cost) return;
+        coins -= cost;
+        u.owned++;
+        cps += u.cpsBonus;
+        clickPower += u.clickBonus;
+        document.getElementById('jokeText').textContent = '"' + u.joke + '"';
+        updateDisplay();
+        renderShop();
+    }
+
+    function updateDisplay() {
+        document.getElementById('coinDisplay').textContent = formatNum(coins);
+        document.getElementById('cpsDisplay').textContent = formatNum(cps) + ' coins/sec';
+        document.getElementById('totalEarned').textContent = 'total earned: ' + formatNum(totalEarned);
+        renderShop();
+    }
+
+    function renderShop() {
+        const container = document.getElementById('shopContainer');
+        container.innerHTML = '';
+        for (const u of upgrades) {
+            const cost = getCost(u);
+            const btn = document.createElement('button');
+            btn.className = 'upgrade-btn';
+            btn.disabled = coins < cost;
+            btn.innerHTML = `
+                <span class="u-owned">${u.owned > 0 ? 'x'+u.owned : ''}</span>
+                <div class="u-name">${u.name}</div>
+                <div class="u-desc">${u.desc}</div>
+                <div class="u-cost">🪙 ${formatNum(cost)}</div>
+            `;
+            btn.onclick = () => buyUpgrade(u.id);
+            container.appendChild(btn);
+        }
+    }
+
+    // Auto-clicker tick
+    setInterval(() => {
+        if (cps > 0) {
+            coins += cps / 20;
+            totalEarned += cps / 20;
+            updateDisplay();
+        }
+    }, 50);
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('open');
+    }
+
+    renderShop();
+</script>
+</body>
+</html>

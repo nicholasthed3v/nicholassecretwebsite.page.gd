@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic 8-Ball</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #ddd;
+            min-height: 100vh;
+            padding: 80px 20px 20px;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            color: #aaa;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1001;
+        }
+        
+        .menu-btn:hover {
+            background: #111;
+            color: #fff;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 70px 15px 20px;
+            overflow-y: auto;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .version {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-section h3 {
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        .nav-link {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            padding: 8px 10px;
+            margin: 3px 0;
+            font-size: 13px;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background: #111;
+            border-left-color: #444;
+            color: #fff;
+        }
+        
+        .home-link {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: #111;
+            border: 1px solid #222;
+            text-align: center;
+        }
+        
+        .home-link:hover {
+            background: #1a1a1a;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        pre {
+            color: #888;
+            margin: 20px 0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            max-width: 400px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            color: #ddd;
+            padding: 12px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            background: #111;
+            border: 1px solid #333;
+            color: #aaa;
+            padding: 12px 24px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        #answer {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Nicholas's Website</div>
+        <div class="version">v4.0</div>
+        
+        <a href="index.html" class="home-link">← Home</a>
+        
+        <div class="nav-section">
+            <h3>Tools</h3>
+            <a href="weatherprank.html" class="nav-link">Weather</a>
+            <a href="calculator.html" class="nav-link">Calculator</a>
+            <a href="downloadram.html" class="nav-link">Download RAM</a>
+            <a href="virusscan.html" class="nav-link">Virus Scan</a>
+            <a href="magic8ball.html" class="nav-link">Magic 8-Ball</a>
+            <a href="excuses.html" class="nav-link">Excuses</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Games</h3>
+            <a href="squarejump.html" class="nav-link">Square Jump</a>
+            <a href="scratch.html" class="nav-link">Flap Me Bird</a>
+            <a href="button.html" class="nav-link">Useless Button</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Other</h3>
+            <a href="asciiart.html" class="nav-link">ASCII Art</a>
+            <a href="cube3d.html" class="nav-link">3D Cube</a>
+            <a href="hacker.html" class="nav-link">Terminal</a>
+            <a href="pi.html" class="nav-link">Pi Digits</a>
+            <a href="loading.html" class="nav-link">Loading</a>
+        </div>
+    </div>
+    
+    <h1>Magic 8-Ball</h1>
+    <pre>
+       _____
+      /     \
+     /   8   \
+    |         |
+     \       /
+      \_____/
+    </pre>
+    <p>Ask a yes or no question:</p>
+    <input type="text" id="question" placeholder="Will I pass my test?">
+    <br><br>
+    <button onclick="shake()">Shake the 8-Ball</button>
+    <p id="answer"></p>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+        
+        async function shake() {
+            const question = document.getElementById('question').value;
+            if (!question) {
+                document.getElementById('answer').textContent = 'Ask a question first!';
+                return;
+            }
+            
+            // Check for profanity via PHP
+            const formData = new FormData();
+            formData.append('text', question);
+            
+            try {
+                const response = await fetch('check_profanity.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.text();
+                
+                if (result === 'profane') {
+                    document.getElementById('answer').textContent = '🎱 ERROR';
+                    return;
+                }
+            } catch(e) {
+                console.error('Profanity check failed');
+            }
+            
+            // Check for banned words
+            const bannedWords = ['nicholas', 'nick', 'nic'];
+            const questionLower = question.toLowerCase();
+            
+            for (let word of bannedWords) {
+                if (questionLower.includes(word)) {
+                    document.getElementById('answer').textContent = '🎱 ERROR';
+                    return;
+                }
+            }
+            
+            const answers = [
+                'Yes',
+                'No',
+                'Maybe',
+                'Ask again later',
+                'Definitely',
+                'Absolutely not',
+                'The stars say yes',
+                'Outlook not so good',
+                'Very doubtful',
+                'Signs point to yes',
+                'Cannot predict now',
+                'My sources say no',
+                'Reply hazy, try again',
+                'Better not tell you now',
+                'As I see it, yes',
+                'Concentrate and ask again',
+                'Don\'t count on it',
+                'Most likely',
+                'Without a doubt'
+            ];
+            
+            const random = answers[Math.floor(Math.random() * answers.length)];
+            document.getElementById('answer').textContent = '🎱 ' + random;
+        }
+    </script>
+</body>
+</html>

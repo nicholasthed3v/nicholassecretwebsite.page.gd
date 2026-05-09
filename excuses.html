@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excuse Generator</title>
+</head>
+<body>
+    <h1>Random Excuse Generator</h1>
+    <p>Need an excuse? Generate one here!</p>
+    <button onclick="generateExcuse()">Generate Excuse</button>
+    <p id="excuse"></p>
+    <br>
+    <a href="index.html">Back to Home</a>
+
+    <script>
+        function generateExcuse() {
+            const excuses = [
+                "My dog ate my homework.",
+                "I was abducted by aliens.",
+                "My alarm didn't go off.",
+                "I got stuck in traffic.",
+                "My computer crashed.",
+                "I forgot to set my alarm.",
+                "I was helping an old lady cross the street.",
+                "My cat unplugged my computer.",
+                "I was trapped in an elevator.",
+                "I lost track of time.",
+                "My phone died.",
+                "I had to save the world from an asteroid.",
+                "A wizard turned me into a newt.",
+                "I was solving world hunger.",
+                "My house was invaded by squirrels.",
+                "I was busy inventing time travel.",
+                "A meteor landed in my backyard.",
+                "I was negotiating peace talks.",
+                "My calendar was hacked.",
+                "I was recruited by the FBI.",
+                "I got lost in a parallel dimension.",
+                "My evil twin did it.",
+                "I was learning to speak dolphin.",
+                "A black hole appeared in my room.",
+                "I was too busy being awesome."
+            ];
+            
+            const random = excuses[Math.floor(Math.random() * excuses.length)];
+            document.getElementById('excuse').textContent = random;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D ASCII Cube</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #ddd;
+            min-height: 100vh;
+            padding: 80px 20px 20px;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            color: #aaa;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1001;
+        }
+        
+        .menu-btn:hover {
+            background: #111;
+            color: #fff;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 70px 15px 20px;
+            overflow-y: auto;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .version {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-section h3 {
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        .nav-link {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            padding: 8px 10px;
+            margin: 3px 0;
+            font-size: 13px;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background: #111;
+            border-left-color: #444;
+            color: #fff;
+        }
+        
+        .home-link {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: #111;
+            border: 1px solid #222;
+            text-align: center;
+        }
+        
+        .home-link:hover {
+            background: #1a1a1a;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        #cube {
+            font-family: 'Courier New', monospace;
+            line-height: 1.2;
+            color: #888;
+            margin: 20px 0;
+            font-size: 10px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            background: #111;
+            border: 1px solid #333;
+            color: #aaa;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Nicholas's Website</div>
+        <div class="version">v4.0</div>
+        
+        <a href="index.html" class="home-link">← Home</a>
+        
+        <div class="nav-section">
+            <h3>Tools</h3>
+            <a href="weatherprank.html" class="nav-link">Weather</a>
+            <a href="calculator.html" class="nav-link">Calculator</a>
+            <a href="downloadram.html" class="nav-link">Download RAM</a>
+            <a href="virusscan.html" class="nav-link">Virus Scan</a>
+            <a href="magic8ball.html" class="nav-link">Magic 8-Ball</a>
+            <a href="excuses.html" class="nav-link">Excuses</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Games</h3>
+            <a href="squarejump.html" class="nav-link">Square Jump</a>
+            <a href="scratch.html" class="nav-link">Flap Me Bird</a>
+            <a href="button.html" class="nav-link">Useless Button</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Other</h3>
+            <a href="asciiart.html" class="nav-link">ASCII Art</a>
+            <a href="cube3d.html" class="nav-link">3D Cube</a>
+            <a href="hacker.html" class="nav-link">Terminal</a>
+            <a href="pi.html" class="nav-link">Pi Digits</a>
+            <a href="loading.html" class="nav-link">Loading</a>
+        </div>
+    </div>
+    
+    <h1>3D ASCII Cube Renderer</h1>
+    <pre id="cube"></pre>
+    <div class="controls">
+        <button onclick="rotateX(0.1)">Rotate X+</button>
+        <button onclick="rotateX(-0.1)">Rotate X-</button>
+        <button onclick="rotateY(0.1)">Rotate Y+</button>
+        <button onclick="rotateY(-0.1)">Rotate Y-</button>
+        <button onclick="rotateZ(0.1)">Rotate Z+</button>
+        <button onclick="rotateZ(-0.1)">Rotate Z-</button>
+        <button onclick="autoRotate()">Auto Rotate</button>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+        
+        let angleX = 0;
+        let angleY = 0;
+        let angleZ = 0;
+        let auto = false;
+
+        const width = 60;
+        const height = 30;
+
+        function drawCube() {
+            const buffer = Array(height).fill(0).map(() => Array(width).fill(' '));
+            const zBuffer = Array(height).fill(0).map(() => Array(width).fill(-Infinity));
+
+            const vertices = [
+                [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+                [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+            ];
+
+            const edges = [
+                [0, 1], [1, 2], [2, 3], [3, 0],
+                [4, 5], [5, 6], [6, 7], [7, 4],
+                [0, 4], [1, 5], [2, 6], [3, 7]
+            ];
+
+            const rotatedVertices = vertices.map(v => {
+                let [x, y, z] = v;
+                
+                let y1 = y * Math.cos(angleX) - z * Math.sin(angleX);
+                let z1 = y * Math.sin(angleX) + z * Math.cos(angleX);
+                y = y1; z = z1;
+                
+                let x1 = x * Math.cos(angleY) + z * Math.sin(angleY);
+                z1 = -x * Math.sin(angleY) + z * Math.cos(angleY);
+                x = x1; z = z1;
+                
+                x1 = x * Math.cos(angleZ) - y * Math.sin(angleZ);
+                y1 = x * Math.sin(angleZ) + y * Math.cos(angleZ);
+                x = x1; y = y1;
+
+                return [x, y, z];
+            });
+
+            edges.forEach(edge => {
+                const [v1, v2] = edge;
+                const [x1, y1, z1] = rotatedVertices[v1];
+                const [x2, y2, z2] = rotatedVertices[v2];
+
+                const steps = 30;
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / steps;
+                    const x = x1 + (x2 - x1) * t;
+                    const y = y1 + (y2 - y1) * t;
+                    const z = z1 + (z2 - z1) * t;
+
+                    const distance = 5;
+                    const scale = distance / (distance + z);
+                    
+                    const screenX = Math.floor((x * scale + 1) * width / 2);
+                    const screenY = Math.floor((y * scale + 1) * height / 2);
+
+                    if (screenX >= 0 && screenX < width && screenY >= 0 && screenY < height) {
+                        if (z > zBuffer[screenY][screenX]) {
+                            zBuffer[screenY][screenX] = z;
+                            const chars = '.:-=+*#%@';
+                            const charIndex = Math.floor((z + 2) / 4 * chars.length);
+                            buffer[screenY][screenX] = chars[Math.min(charIndex, chars.length - 1)];
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('cube').textContent = buffer.map(row => row.join('')).join('\n');
+        }
+
+        function rotateX(angle) {
+            angleX += angle;
+            drawCube();
+        }
+
+        function rotateY(angle) {
+            angleY += angle;
+            drawCube();
+        }
+
+        function rotateZ(angle) {
+            angleZ += angle;
+            drawCube();
+        }
+
+        function autoRotate() {
+            auto = !auto;
+            if (auto) {
+                const interval = setInterval(() => {
+                    if (!auto) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    angleX += 0.05;
+                    angleY += 0.03;
+                    angleZ += 0.02;
+                    drawCube();
+                }, 50);
+            }
+        }
+
+        drawCube();
+    </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <p><a href="index.html">Back to Home</a></p>
+    
+    <h2>User Management</h2>
+    <div id="users">Loading...</div>
+    
+    <h2>Feature Management</h2>
+    <div id="features">Loading...</div>
+    
+    <h2>Character Limits</h2>
+    <h3>Hacker Inject Message Limit</h3>
+    <p>Current limit: <span id="currentLimit">50</span> characters</p>
+    <input type="number" id="newLimit" value="50" min="1" max="200">
+    <button onclick="setCharLimit()">Update Limit</button>
+    
+    <h3>Username Character Limit</h3>
+    <p>Current limit: <span id="currentUsernameLimit">50</span> characters</p>
+    <input type="number" id="newUsernameLimit" value="50" min="3" max="100">
+    <button onclick="setUsernameLimit()">Update Username Limit</button>
+    
+    <p id="message"></p>
+
+    <script>
+        // Check if admin (redirects if not)
+        fetch('check_admin.php')
+            .then(r => r.text())
+            .then(text => {
+                if (text !== 'admin') {
+                    alert('Access denied - Admin only');
+                    window.location.href = 'index.html';
+                } else {
+                    loadUsers();
+                    loadFeatures();
+                    loadCharLimit();
+                    loadUsernameLimit();
+                }
+            });
+        
+        // Load users
+        function loadUsers() {
+            fetch('admin_process.php?get_users=1')
+                .then(r => r.json())
+                .then(users => {
+                    let html = '<table border="1"><tr><th>Username</th><th>Banned</th><th>Admin</th><th>Action</th></tr>';
+                    for (let username in users) {
+                        let user = users[username];
+                        let banned = user.banned === 'true';
+                        let admin = user.admin === 'true';
+                        html += '<tr>';
+                        html += '<td>' + username + '</td>';
+                        html += '<td>' + (banned ? 'Yes' : 'No') + '</td>';
+                        html += '<td>' + (admin ? 'Yes' : 'No') + '</td>';
+                        html += '<td>';
+                        if (!banned) {
+                            html += '<button onclick="banUser(\'' + username + '\')">Ban</button>';
+                        } else {
+                            html += '<button onclick="unbanUser(\'' + username + '\')">Unban</button>';
+                        }
+                        html += '</td></tr>';
+                    }
+                    html += '</table>';
+                    document.getElementById('users').innerHTML = html;
+                });
+        }
+        
+        // Load features
+        function loadFeatures() {
+            fetch('admin_process.php?get_features=1')
+                .then(r => r.json())
+                .then(features => {
+                    let html = '<table border="1"><tr><th>Feature</th><th>Status</th><th>Action</th></tr>';
+                    for (let feature in features) {
+                        let enabled = features[feature] === 'enabled';
+                        html += '<tr>';
+                        html += '<td>' + feature.replace('_', ' ') + '</td>';
+                        html += '<td>' + (enabled ? 'Enabled' : 'Disabled') + '</td>';
+                        html += '<td>';
+                        if (enabled) {
+                            html += '<button onclick="toggleFeature(\'' + feature + '\', \'disabled\')">Disable</button>';
+                        } else {
+                            html += '<button onclick="toggleFeature(\'' + feature + '\', \'enabled\')">Enable</button>';
+                        }
+                        html += '</td></tr>';
+                    }
+                    html += '</table>';
+                    document.getElementById('features').innerHTML = html;
+                });
+        }
+        
+        // Load char limit
+        function loadCharLimit() {
+            fetch('admin_process.php?get_char_limit=1')
+                .then(r => r.text())
+                .then(limit => {
+                    document.getElementById('currentLimit').textContent = limit;
+                    document.getElementById('newLimit').value = limit;
+                });
+        }
+        
+        // Load username limit
+        function loadUsernameLimit() {
+            fetch('admin_process.php?get_username_limit=1')
+                .then(r => r.text())
+                .then(limit => {
+                    document.getElementById('currentUsernameLimit').textContent = limit;
+                    document.getElementById('newUsernameLimit').value = limit;
+                });
+        }
+        
+        // Ban user
+        function banUser(username) {
+            const formData = new FormData();
+            formData.append('ban_user', '1');
+            formData.append('username', username);
+            
+            fetch('admin_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.text())
+            .then(msg => {
+                document.getElementById('message').textContent = msg;
+                loadUsers();
+            });
+        }
+        
+        // Unban user
+        function unbanUser(username) {
+            const formData = new FormData();
+            formData.append('unban_user', '1');
+            formData.append('username', username);
+            
+            fetch('admin_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.text())
+            .then(msg => {
+                document.getElementById('message').textContent = msg;
+                loadUsers();
+            });
+        }
+        
+        // Toggle feature
+        function toggleFeature(feature, status) {
+            const formData = new FormData();
+            formData.append('toggle_feature', '1');
+            formData.append('feature', feature);
+            formData.append('status', status);
+            
+            fetch('admin_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.text())
+            .then(msg => {
+                document.getElementById('message').textContent = msg;
+                loadFeatures();
+            });
+        }
+        
+        // Set char limit
+        function setCharLimit() {
+            const limit = document.getElementById('newLimit').value;
+            const formData = new FormData();
+            formData.append('set_char_limit', '1');
+            formData.append('limit', limit);
+            
+            fetch('admin_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.text())
+            .then(msg => {
+                document.getElementById('message').textContent = msg;
+                loadCharLimit();
+            });
+        }
+        
+        // Set username limit
+        function setUsernameLimit() {
+            const limit = document.getElementById('newUsernameLimit').value;
+            const formData = new FormData();
+            formData.append('set_username_limit', '1');
+            formData.append('limit', limit);
+            
+            fetch('admin_process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.text())
+            .then(msg => {
+                document.getElementById('message').textContent = msg;
+                loadUsernameLimit();
+            });
+        }
+    </script>
+</body>
+</html>

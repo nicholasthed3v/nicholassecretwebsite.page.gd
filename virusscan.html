@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virus Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #ddd;
+            min-height: 100vh;
+            padding: 80px 20px 20px;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            color: #aaa;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1001;
+        }
+        
+        .menu-btn:hover {
+            background: #111;
+            color: #fff;
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            padding: 70px 15px 20px;
+            overflow-y: auto;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .version {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-section h3 {
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        .nav-link {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            padding: 8px 10px;
+            margin: 3px 0;
+            font-size: 13px;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background: #111;
+            border-left-color: #444;
+            color: #fff;
+        }
+        
+        .home-link {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: #111;
+            border: 1px solid #222;
+            text-align: center;
+        }
+        
+        .home-link:hover {
+            background: #1a1a1a;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            font-size: 24px;
+            color: #fff;
+            margin-top: 20px;
+        }
+        
+        button {
+            background: #111;
+            border: 1px solid #333;
+            color: #aaa;
+            padding: 12px 24px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        #status, #progress {
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            color: #888;
+        }
+        
+        ul {
+            margin-top: 15px;
+            margin-left: 20px;
+        }
+        
+        li {
+            color: #ff6666;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Nicholas's Website</div>
+        <div class="version">v4.0</div>
+        
+        <a href="index.html" class="home-link">← Home</a>
+        
+        <div class="nav-section">
+            <h3>Tools</h3>
+            <a href="weatherprank.html" class="nav-link">Weather</a>
+            <a href="calculator.html" class="nav-link">Calculator</a>
+            <a href="downloadram.html" class="nav-link">Download RAM</a>
+            <a href="virusscan.html" class="nav-link">Virus Scan</a>
+            <a href="magic8ball.html" class="nav-link">Magic 8-Ball</a>
+            <a href="excuses.html" class="nav-link">Excuses</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Games</h3>
+            <a href="squarejump.html" class="nav-link">Square Jump</a>
+            <a href="scratch.html" class="nav-link">Flap Me Bird</a>
+            <a href="button.html" class="nav-link">Useless Button</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Other</h3>
+            <a href="asciiart.html" class="nav-link">ASCII Art</a>
+            <a href="cube3d.html" class="nav-link">3D Cube</a>
+            <a href="hacker.html" class="nav-link">Terminal</a>
+            <a href="pi.html" class="nav-link">Pi Digits</a>
+            <a href="loading.html" class="nav-link">Loading</a>
+        </div>
+    </div>
+    
+    <h1>Virus Scanner</h1>
+    
+    <div id="start">
+        <p>Scan your computer for viruses and malware.</p>
+        <button onclick="startScan()">Start Scan</button>
+    </div>
+    
+    <div id="scanning" style="display: none;">
+        <p>Scanning system...</p>
+        <p id="status">Checking system files...</p>
+        <p id="progress">▓░░░░░░░░░░░░░░░░░░░</p>
+    </div>
+    
+    <div id="results" style="display: none;">
+        <h2>Scan Complete!</h2>
+        <p>Threats found: <span id="threatCount"></span></p>
+        <ul id="threatList"></ul>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+        
+        function startScan() {
+            document.getElementById('start').style.display = 'none';
+            document.getElementById('scanning').style.display = 'block';
+            
+            const statuses = [
+                'Checking system files...',
+                'Scanning downloads folder...',
+                'Analyzing browser history...',
+                'Checking installed programs...',
+                'Finalizing scan...'
+            ];
+            
+            const bars = [
+                '▓▓▓▓░░░░░░░░░░░░░░░░',
+                '▓▓▓▓▓▓▓▓░░░░░░░░░░░░',
+                '▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░',
+                '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░',
+                '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓'
+            ];
+            
+            const threats = [
+                'too_many_memes.exe',
+                'homework_folder_suspicious.dll',
+                'definitely_not_a_game.bat',
+                'system32_backup_real.exe',
+                'free_vbucks_generator.js',
+                'minecraft_free_download.scr',
+                'your_mom.virus',
+                'totally_legit_antivirus.exe'
+            ];
+            
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < statuses.length) {
+                    document.getElementById('status').textContent = statuses[step];
+                    document.getElementById('progress').textContent = bars[step];
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    
+                    const numThreats = Math.floor(Math.random() * 5) + 3;
+                    const foundThreats = [];
+                    for (let i = 0; i < numThreats; i++) {
+                        foundThreats.push(threats[Math.floor(Math.random() * threats.length)]);
+                    }
+                    
+                    document.getElementById('scanning').style.display = 'none';
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('threatCount').textContent = numThreats;
+                    
+                    const list = document.getElementById('threatList');
+                    foundThreats.forEach(threat => {
+                        const li = document.createElement('li');
+                        li.textContent = threat;
+                        list.appendChild(li);
+                    });
+                }
+            }, 800);
+        }
+    </script>
+</body>
+</html>
